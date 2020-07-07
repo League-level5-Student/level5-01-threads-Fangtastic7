@@ -31,6 +31,7 @@ public class SynchronizedSwimming {
 		System.out.println(swimmer.name + " started a lap!");
 		Thread.sleep(2000);
 		System.out.println(swimmer.name + " finished!");
+		takeTurn(swimmer);
 	}
 
 	public static void takeTurn(Swimmer swimmer) {

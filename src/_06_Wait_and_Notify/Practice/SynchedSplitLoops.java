@@ -17,29 +17,49 @@ printed in order.
 
 public class SynchedSplitLoops {
 	static int counter = 0;
-	
+	static Object threadlock = new Object();
+
 	public static void main(String[] args) {
+
 		Thread t1 = new Thread(() -> {
-			for(int i = 0; i < 100000; i++) {
-				counter++;
+
+			for (int i = 0; i < 100000; i++) {
+				synchronized (threadlock) {
+					counter++;
+					threadlock.notify();
+					try {
+						threadlock.wait();
+					} catch (InterruptedException e) {
+						System.out.println("error!");
+					}
+				}
 			}
 		});
-		
+
 		Thread t2 = new Thread(() -> {
-			for(int i = 0; i < 100000; i++) {
-				System.out.println(counter);
+
+			for (int i = 0; i < 100001; i++) {
+				synchronized (threadlock) {
+					System.out.println(counter);
+					threadlock.notify();
+					try {
+						threadlock.wait();
+					} catch (InterruptedException e) {
+						System.out.println("error!");
+					}
+				}
 			}
 		});
-		
-		t1.start();
+
 		t2.start();
-		
+		t1.start();
+
 		try {
 			t1.join();
 			t2.join();
 		} catch (InterruptedException e) {
 			System.err.println("Could not join threads");
 		}
-		
 	}
+
 }
